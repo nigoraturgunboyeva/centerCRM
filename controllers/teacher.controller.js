@@ -1,6 +1,6 @@
 class teacherController{
     async addTeacher(req, res) {
-
+        
     }
     async getOneTeacher(req, res) {
 
