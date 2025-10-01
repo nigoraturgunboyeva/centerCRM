@@ -1,6 +1,6 @@
 class studentController{
     async addStudent(req, res){
-
+        // const {fullname, phone_number, level}
     }
     async getOneStudent(req, res){
 

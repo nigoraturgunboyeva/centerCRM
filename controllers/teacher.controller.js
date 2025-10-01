@@ -1,6 +1,71 @@
+const jwt = require("jsonwebtoken");
 const db = require("../database/db")
 const bcrypt = require("bcrypt");
+require("dotenv").config();
+
 class teacherController{
+    async signUp(req, res) {
+  try {
+    const { fullname, email, password } = req.body;
+
+    const teacher = await db.query("SELECT * FROM teachers WHERE email=$1", [email]);
+    if (teacher.rows.length > 0) {
+      return res.status(400).json({ error: "This email already exists!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await db.query(
+      "INSERT INTO teachers (fullname, email, password) VALUES ($1, $2, $3) RETURNING id, fullname, email",
+      [fullname, email, hashedPassword]
+    );
+
+    const teacher_jwt = result.rows[0];
+
+    const token = jwt.sign(
+      { id: teacher_jwt.id, fullname: teacher_jwt.fullname },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ message: "Signup successful", token, teacher: teacher_jwt });
+  } catch (error) {
+    console.error(error, "error while signing UP");
+    res.status(500).json({ error: "Something went wrong" });
+  }
+    }
+    async signIn(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    const result = await db.query("SELECT * FROM teachers WHERE email=$1", [email]);
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: "User doesn't exist!" });
+    }
+
+    const teacher = result.rows[0];
+
+    const isPasswordValid = await bcrypt.compare(password, teacher.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    const token = jwt.sign(
+      { id: teacher.id, email: teacher.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      teacher: { id: teacher.id, fullname: teacher.fullname, email: teacher.email }
+    });
+  } catch (error) {
+    console.error(error, "error while signing in");
+    res.status(500).json({ error: "Something went wrong" });
+  }
+    }
     async addTeacher(req, res) {
         const {fullname, email, password} = req.body;
         const hashedPassword = await bcrypt.hash(password, 15);
@@ -33,3 +98,21 @@ class teacherController{
 }
 
 module.exports = new teacherController()
+// const loginFunction = async (req, res) => {
+    // try {
+//         const { phoneNumber, password } = req.body;
+
+//         const auth = await Auth.findOne({ phoneNumber });
+//         if (!auth) return res.status(404).json({ type: "phone", message: "Foydalanuvchi topilmadi" });
+
+//         if (!auth.verified) return res.status(400).json({ message: "Foydalanuvchi verifikatsiyadan o'tmagan" });
+
+//         const isMatch = await bcrypt.compare(password, auth.password);
+//         if (!isMatch) return res.status(400).json({ type: "password", message: "Parol xato" });
+
+//         generateToken(auth, res);
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send(error);
+//     }
+// };
