@@ -9,12 +9,11 @@ create TABLE student(
     fullname VARCHAR(200),
     phone_number VARCHAR(12),
     level VARCHAR (200),
-
+    created_at TIMESTAMP DEFAULT NOW(),
 );
 create TABLE student_attendance(
     id SERIAL PRIMARY KEY,
     student_id INT REFERENCES student(id) ON DELETE CASCADE,
     date DATE NOT NULL,
-    status VARCHAR(20) CHECK (status IN ('presence', 'absence')),
-    UNIQUE(student_id, date)
+    status VARCHAR(20) CHECK (status IN ('presence', 'absence', 'late')),
 );
