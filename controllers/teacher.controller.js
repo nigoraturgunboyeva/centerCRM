@@ -98,21 +98,3 @@ class teacherController{
 }
 
 module.exports = new teacherController()
-// const loginFunction = async (req, res) => {
-    // try {
-//         const { phoneNumber, password } = req.body;
-
-//         const auth = await Auth.findOne({ phoneNumber });
-//         if (!auth) return res.status(404).json({ type: "phone", message: "Foydalanuvchi topilmadi" });
-
-//         if (!auth.verified) return res.status(400).json({ message: "Foydalanuvchi verifikatsiyadan o'tmagan" });
-
-//         const isMatch = await bcrypt.compare(password, auth.password);
-//         if (!isMatch) return res.status(400).json({ type: "password", message: "Parol xato" });
-
-//         generateToken(auth, res);
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send(error);
-//     }
-// };

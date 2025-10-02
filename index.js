@@ -1,9 +1,15 @@
+require("dotenv").config();
 const express = require("express");
-const teacherRoute = require("./routes/teacher.route")
-const PORT = process.env.PORT || 5000
-const env = require("dotenv").config()
-const app = express();
+const cors = require("cors");
 
-app.listen(PORT, () => {console.log(`${PORT} is successfully running`)})
-app.use(express.json())
-app.use("/api", teacherRoute)
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json());
+app.use(cors({ origin: 'http://localhost:5000', credentials: true }));
+
+require("./direction/direction")(app); 
+
+app.listen(PORT, () => {
+    console.log(`${PORT} is successfully running 🚀`);
+});
